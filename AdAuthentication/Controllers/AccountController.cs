@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using AdAuthentication.TokenStorage;
 using System.Security.Claims;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace AdAuthentication.Controllers
 {
@@ -21,7 +22,11 @@ namespace AdAuthentication.Controllers
                 Request.GetOwinContext().Authentication.Challenge(
                     new AuthenticationProperties { RedirectUri = "/" },
                     OpenIdConnectAuthenticationDefaults.AuthenticationType);
+
+                return;
             }
+
+            ViewBag.User = "Testando";
         }
 
         public ActionResult SignOut()
