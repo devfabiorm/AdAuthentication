@@ -1,14 +1,9 @@
-﻿using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.OpenIdConnect;
+﻿using AdAuthentication.TokenStorage;
 using Microsoft.Owin.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
 using System.Web;
 using System.Web.Mvc;
-using AdAuthentication.TokenStorage;
-using System.Security.Claims;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace AdAuthentication.Controllers
 {

@@ -86,29 +86,7 @@ namespace AdAuthentication
                 .WithAuthority(authority)
                 .Build();
 
-            //var tokenStore = new SessionTokenCustomCache(app.UserTokenCache, HttpContext.Current);
-
-            app.AddDistributedTokenCache(services =>
-            {
-                services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = "localhost";
-                    options.InstanceName = "Redis";
-                });
-
-                services.Configure<MsalDistributedTokenCacheAdapterOptions>(options =>
-                {
-                    options.OnL2CacheFailure = (ex) =>
-                    {
-                        if (ex is StackExchange.Redis.RedisConnectionException)
-                        {
-                            // action: try to reconnect or something
-                            return true; //try to do the cache operation again
-                        }
-                        return false;
-                    };
-                });
-            });
+            var tokenStore = new SessionTokenCustomCache(app.UserTokenCache, HttpContext.Current);
 
             try
             {
@@ -117,17 +95,17 @@ namespace AdAuthentication
                 var result = await app.AcquireTokenByAuthorizationCode(
                     scopes, notification.Code).ExecuteAsync();
 
-                //var idToken = new JwtSecurityToken(result.IdToken);
+                var idToken = new JwtSecurityToken(result.IdToken);
 
                 //Populating authentication context with data got from token
-                //var accountIdClaim = new Claim("aid", tokenStore.UserUniqueIdentifier);
-                //var appRoles = idToken.Claims.Where(c => c.Type.Equals(ClaimTypes.Role)).ToList();
-                //var claimsList = new List<Claim> { accountIdClaim }.Concat(appRoles).ToList();
-                //notification.AuthenticationTicket.Identity.AddClaims(claimsList);
+                var accountIdClaim = new Claim("aid", tokenStore.UserUniqueIdentifier);
+                var appRoles = idToken.Claims.Where(c => c.Type.Equals(ClaimTypes.Role)).ToList();
+                var claimsList = new List<Claim> { accountIdClaim }.Concat(appRoles).ToList();
+                notification.AuthenticationTicket.Identity.AddClaims(claimsList);
 
-                //var userDetails = await GraphHelper.GetUserDetailsAsync(result.AccessToken, tokenStore.UserUniqueIdentifier);
+                var userDetails = await GraphHelper.GetUserDetailsAsync(result.AccessToken, tokenStore.UserUniqueIdentifier);
 
-                //tokenStore.SaveUserDetails(userDetails);
+                tokenStore.SaveUserDetails(userDetails);
                 notification.HandleCodeRedemption(null, result.IdToken);
             }
             catch (MsalException ex)
