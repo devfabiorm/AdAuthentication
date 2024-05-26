@@ -64,7 +64,7 @@ namespace AdAuthentication2v1
                         try
                         {
                             var scopes = graphScopes.Split(' ');
-                            var result = await ConfidentialClientApplicationProvider.GetApplicationTokensAsync(scopes, context.Code);
+                            var result = await AuthenticationProvider.GetApplicationTokensAsync(scopes, context.Code);
                             var homeAccountIdClaim = new Claim("aid", result.AccountId);
 
                             context.AuthenticationTicket.Identity.AddClaim(homeAccountIdClaim);

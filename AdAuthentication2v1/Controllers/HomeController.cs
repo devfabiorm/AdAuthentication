@@ -1,4 +1,5 @@
-﻿using AdAuthentication2v1.Providers;
+﻿using AdAuthentication2v1.Helpers;
+using AdAuthentication2v1.Providers;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -20,8 +21,15 @@ namespace AdAuthentication2v1.Controllers
 
                 var homeAccountId = claims.FindFirst(c => c.Type == "aid")?.Value;
 
-                var account = await ConfidentialClientApplicationProvider.GetAccountAsync(homeAccountId);
+                var account = await AuthenticationProvider.GetAccountAsync(homeAccountId);
+
+                string[] graphScopes = ConfigurationManager.AppSettings["AppScopes"].Split(' ');
+
+                var tokens = await AuthenticationProvider.GetApplicationTokensAsync(graphScopes, account: account);
+
+                ViewBag.User = await GraphHelper.GetUserDetailsAsync(tokens.AccessToken);
             }
+
             return View();
         }
 

@@ -6,13 +6,12 @@ using Microsoft.Identity.Web.TokenCacheProviders.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace AdAuthentication2v1.Providers
 {
-    public static class ConfidentialClientApplicationProvider
+    public static class AuthenticationProvider
     {
         private const string Oid = "oid";
         private const string Tid = "tid";
@@ -30,7 +29,8 @@ namespace AdAuthentication2v1.Providers
         private static readonly string authority = string.Format(System.Globalization.CultureInfo.InvariantCulture, ConfigurationManager.AppSettings["Authority"], tenant);
 
         // We keep global client app
-        private static Lazy<IConfidentialClientApplication> lazyClientApp = new Lazy<IConfidentialClientApplication>(() => {
+        private static Lazy<IConfidentialClientApplication> lazyClientApp = new Lazy<IConfidentialClientApplication>(() =>
+        {
 
             var app = ConfidentialClientApplicationBuilder
                 .Create(clienteId)
@@ -70,14 +70,9 @@ namespace AdAuthentication2v1.Providers
         },
             true);
 
-        public static async Task<AuthenticationInformation> GetApplicationTokensAsync(IEnumerable<string> scopes, string applicationCode)
+        public static async Task<AuthenticationInformation> GetApplicationTokensAsync(IEnumerable<string> scopes, string applicationCode = null, IAccount account = null)
         {
-            var app = lazyClientApp.Value;
-
-            var result = await app.AcquireTokenByAuthorizationCode(
-                    scopes, applicationCode).ExecuteAsync();
-
-
+            var result = await AuthenticateAsync(scopes, applicationCode, account);
 
             return new AuthenticationInformation
             {
@@ -87,13 +82,52 @@ namespace AdAuthentication2v1.Providers
             };
         }
 
-        public static async Task<IAccount> GetAccountAsync(string accountId)
+        public static Task<IAccount> GetAccountAsync(string accountId)
         {
             var app = lazyClientApp.Value;
 
-            var test = await app.GetAccountAsync(accountId);
+            return app.GetAccountAsync(accountId);
+        }
 
-            return test;
+        private static async Task<AuthenticationResult> AuthenticateAsync(IEnumerable<string> scopes, string code = null, IAccount account = null)
+        {
+            var app = lazyClientApp.Value;
+
+            try
+            {
+                if (account == null && !string.IsNullOrEmpty(code))
+                {
+                    //This method does not look in the token cache, but stores the result in it.  (refer to https://learn.microsoft.com/en-us/dotnet/api/microsoft.identity.client.iconfidentialclientapplication?view=msal-dotnet-latest)
+                    return await app.AcquireTokenByAuthorizationCode(scopes, code)
+                        .ExecuteAsync();
+                }
+
+                //This method does look in the token cache before calling Azure. (refer to https://learn.microsoft.com/en-us/dotnet/api/microsoft.identity.client.iconfidentialclientapplication?view=msal-dotnet-latest)
+                return await app.AcquireTokenSilent(scopes, account)
+                                  .ExecuteAsync();
+            }
+            catch (MsalUiRequiredException ex)
+            {
+                // A MsalUiRequiredException happened on AcquireTokenSilent.
+                // This indicates you need to call AcquireTokenInteractive to acquire a token
+                Debug.WriteLine($"MsalUiRequiredException: {ex.Message}");
+
+                try
+                {
+                    return await app.AcquireTokenForClient(scopes)
+                                      .ExecuteAsync();
+                }
+                catch (MsalException msalex)
+                {
+                    Debug.WriteLine($"Error Acquiring Token:{Environment.NewLine}{msalex}");
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error Acquiring Token Silently:{Environment.NewLine}{ex}");
+                throw;
+            }
         }
     }
 }

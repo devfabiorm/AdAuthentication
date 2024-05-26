@@ -372,7 +372,7 @@
     <Compile Include="Models\AuthenticationInformation.cs" />
     <Compile Include="Models\CacheUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\ConfidentialClientApplicationProvider.cs" />
+    <Compile Include="Providers\AuthenticationProvider.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
