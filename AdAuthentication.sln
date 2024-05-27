@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdAuthentication", "AdAuthe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdAuthentication2v1", "AdAuthentication2v1\AdAuthentication2v1.csproj", "{3652D01B-B45D-4275-AF5E-14F67950271B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authenticationv3", "Authenticationv3\Authenticationv3.csproj", "{0EB7A6C3-47C3-4895-A19E-8347E2554B56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3652D01B-B45D-4275-AF5E-14F67950271B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3652D01B-B45D-4275-AF5E-14F67950271B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3652D01B-B45D-4275-AF5E-14F67950271B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EB7A6C3-47C3-4895-A19E-8347E2554B56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EB7A6C3-47C3-4895-A19E-8347E2554B56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EB7A6C3-47C3-4895-A19E-8347E2554B56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EB7A6C3-47C3-4895-A19E-8347E2554B56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
